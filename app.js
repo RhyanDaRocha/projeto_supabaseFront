@@ -3,24 +3,21 @@ const addProductForm = document.querySelector('#add-product-form');
 const updateProductForm = document.querySelector('#update-product-form');
 const updateProductId = document.querySelector('#update-id');
 const updateProductName = document.querySelector('#update-name');
-const updateProductDescription = document.querySelector('#update-description')
+const updateProductDescription = document.querySelector('#update-description');
 const updateProductPrice = document.querySelector('#update-price');
 
 
-// Function to fetch all products from the server
 async function fetchProducts() {
-  const response = await fetch('http://3.17.56.192:3000/products');
+  const response = await fetch('http://localhost:3000/products');
   const products = await response.json();
 
-  // Clear product list
   productList.innerHTML = '';
 
-  // Add each product to the list
   products.forEach(product => {
     const li = document.createElement('li');
     li.innerHTML = `${product.name} - ${product.description} - $${product.price}`;
 
-    // Add delete button for each product
+
     const deleteButton = document.createElement('button');
     deleteButton.innerHTML = 'Delete';
     deleteButton.addEventListener('click', async () => {
@@ -29,7 +26,7 @@ async function fetchProducts() {
     });
     li.appendChild(deleteButton);
 
-    // Add update button for each product
+ 
     const updateButton = document.createElement('button');
     updateButton.innerHTML = 'Update';
     updateButton.addEventListener('click', () => {
@@ -44,8 +41,6 @@ async function fetchProducts() {
   });
 }
 
-
-// Event listener for Add Product form submit button
 addProductForm.addEventListener('submit', async event => {
   event.preventDefault();
   const name = addProductForm.elements['name'].value;
@@ -56,9 +51,9 @@ addProductForm.addEventListener('submit', async event => {
   await fetchProducts();
 });
 
-// Function to add a new product
+
 async function addProduct(name, description, price) {
-  const response = await fetch('http://3.17.56.192:3000/products', {
+  const response = await fetch('http://localhost:3000/products', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -68,28 +63,38 @@ async function addProduct(name, description, price) {
   return response.json();
 }
 
-// Function to delete a new product
 async function deleteProduct(id) {
-  const response = await fetch('http://3.17.56.192:3000/products/' + id, {
+  const response = await fetch(`http://localhost:3000/products/${id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json'
-    },
-    //body: JSON.stringify({id})
+    }
   });
   return response.json();
 }
 
-async function updateProduct(name, description, price) {
-  const response = await fetch('http://3.17.56.192:3000/products', + name , description , price, {
+updateProductForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const id = updateProductForm.elements['id'].value;
+  const name = updateProductForm.elements['name'].value;
+  const description = updateProductForm.elements['description'].value;
+  const price = updateProductForm.elements['price'].value;
+  await updateProduct(id, name, description, price);
+  updateProductForm.reset();
+  await fetchProducts();
+});
+
+async function updateProduct(id, name, description, price) {
+  const response = await fetch(`http://localhost:3000/products/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({ name, description, price })
   });
-  return response.json();
+  const result = await response.json();
+  console.log(result);
+  return result;
 }
 
-// Fetch all products on page load
 fetchProducts();
